@@ -22,6 +22,7 @@
 // In the `pregenerate_asm_main()` case we don't want to access (Cargo)
 // environment variables at all, so avoid `use std::env` here.
 
+#![allow(unused_parens)]
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
