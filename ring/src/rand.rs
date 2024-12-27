@@ -195,7 +195,25 @@ use self::darwin::fill as fill_impl;
 #[cfg(any(target_os = "fuchsia"))]
 use self::fuchsia::fill as fill_impl;
 
-#[cfg(any(target_os = "android", target_os = "linux"))]
+#[cfg(not(feature = "disabled_todo"))]
+mod sysrand_chunk {
+    use crate::error;
+
+    extern {
+        fn sgx_read_rand(p: * mut u8, l: usize) -> u32;
+    }
+
+    #[inline]
+    pub fn chunk(dest: &mut [u8]) -> Result<usize, error::Unspecified> {
+        match unsafe { sgx_read_rand(dest.as_mut_ptr(),
+                                     dest.len()) } {
+            0 => Ok(dest.len()),
+            _ => Err(error::Unspecified),
+        }
+    }
+}
+
+#[cfg(all(any(target_os = "android", target_os = "linux"), feature = "disabled_todo"))]
 mod sysrand_chunk {
     use crate::{c, error};
 
